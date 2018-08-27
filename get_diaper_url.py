@@ -53,7 +53,7 @@ def scrape(html, base_url):
     tex = doc.findAll("a", class_="nav_a")
     diaper_url = 0
     for t in tex:
-        if t.text == "おむつ・おしりふき":
+        if t.text == "本":
             diaper_url = t.attrs['href']
     # 取得した相対URLを絶対URLに変形
     category_page_url = urljoin(base_url, diaper_url)

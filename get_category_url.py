@@ -4,9 +4,9 @@ import urllib.request
 from bs4 import BeautifulSoup as soup
 from urllib.parse import urljoin
 import sys
+from fake_useragent import UserAgent
 
 import requests
-
 
 """
 
@@ -49,9 +49,32 @@ def fetch(base_url):
     :param base_url:　amazonのホームページurl
     :return: str型のamazonのホームページのカテゴリーページURL
     """
+    # urlがbyte文字列の場合utf-8にdecodeしておく
+    if type(base_url) == bytes:
+        base_url = base_url.decode("utf-8")
 
-    # User-Agentの問題で(HTTPError: HTTP Error 503: Forbidden)と出力されたためUser-Agentヘッダーの値をFirefoxに偽装
-    headers = {"User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"}
+    # 複数回のクローリングを実行するとアマゾンのサーバーから拒絶されたためUser-Agentヘッダーの値を偽造
+    UA = UserAgent()
+    ua = UA.safari
+
+    # スマホページからのアクセスをカット
+    if "(iPad;" in ua:
+        ua = UA.safari
+    else:
+        pass
+
+    headers = {'User-Agent': ua}
+
+    r = requests.get(base_url, headers=headers)
+
+    # ステータスコードを確認しresponseが成功しているか確認する
+    if not r.status_code == 200:
+        print("response.status_code is not 200")
+        return None
+
+    r.encoding = r.apparent_encoding
+
+    """
     request = urllib.request.Request(url=base_url, headers=headers)
     response = urllib.request.urlopen(request)
 
@@ -60,8 +83,9 @@ def fetch(base_url):
 
     # デコードしてhtml形式のamazonホームページコードを取得
     html = response.read().decode(encoding)
+    """
 
-    return html
+    return r.text
 
 
 def scrape(html, base_url):

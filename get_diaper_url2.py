@@ -28,7 +28,6 @@ from get_category_url import fetch
 """
 
 
-
 def main():
 
     # 標準出力(ベビーケア・おむつからおむつのハイパーリンク)をtxt形式で保存するファイルを用意
@@ -54,7 +53,7 @@ def scrape(html, base_url):
     tex = doc.findAll("a")
     diaper_url = 0
     for t in tex:
-        if t.text == "おむつ":
+        if t.text == "単行本":
             diaper_url = t.attrs['href']
     # 取得した相対URLを絶対URLに変形
     category_page_url = urljoin(base_url, diaper_url)
